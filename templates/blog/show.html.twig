@@ -3,11 +3,37 @@
 {% block body %}
    <article>
         <h2>{{article.title}}</h2>
-        <div class="metada">Ecrit le 1{{article.createdAt | date("d:m:Y")}} à {{article.createdAt | date('H:i')}} dans la catégorie Politique</div>
+        <div class="metada">Ecrit le {{article.createdAt | date("d/m/Y")}} à {{article.createdAt | date('H:i')}} dans la catégorie {{article.category.title}}</div>
         <div class="content">
             <img src="{{article.image}}" alt="">
                 <hr>
                 {{article.content | raw }}
         </div>
+        <section class="commentaires">
+        <h3>{{article.comments | length }} Commentaires :</h3>
+        {% for comment in article.comments %}
+            <div class="comment">
+                <div class="row">
+                    <div class="col-3">
+                        {{comment.author}} (<small>{{comment.createdAt | date('d/m/Y à H:i')}}</small>)
+                    </div>
+                    <div class="col">
+                        {{comment.content | raw }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            {% if app.user %}
+            {{form_start(commentForm)}}
+            <div class="form-group">Laissez un commentaire
+            {{form_row(commentForm.author, {'label':'Nom', 'attr' : {'placeholder' : 'Votre nom...'}})}}
+            {{form_row(commentForm.content, {'label':'Commentaire', 'attr' : {'placeholder' : 'Le contenu de votre commentaire...'}})}}
+            <button class="btn btn-success">Enregistrer le commentaire</button>
+            </div>
+            {{form_end(commentForm)}}
+            {% endif %}
+
+        </section>
     </article>
 {% endblock %}

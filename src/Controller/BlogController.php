@@ -9,10 +9,15 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Article;
+
 use App\Repository\ArticleRepository;
+use App\Form\CommentType;
+use App\Entity\Article;
+use App\Entity\Category;
+use App\Entity\Comment;
 
 class BlogController extends AbstractController
 {
@@ -50,6 +55,10 @@ class BlogController extends AbstractController
                     ->add('title') 
                     ->add('content') 
                     ->add('image') 
+                    ->add('category', EntityType::class, [
+                        'class' => Category::class,
+                        'choice_label' => 'title'
+                    ])
                     ->getForm(); 
 
         $form->handleRequest($request);
@@ -74,10 +83,25 @@ class BlogController extends AbstractController
     /**
      * @Route("/blog/{id}", name="blog_show")
      */
-    public function show(Article $article) : Response
+    public function show(Article $article, Request $request, EntityManagerInterface $manager) : Response
     {   
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+            $comment->setCreatedAt(new \DateTime())
+                    ->setArticle($article);
+            $manager->persist($comment);
+            $manager->flush();
+
+            return $this->redirectToRoute('blog_show',['id' => $article->getId()]);
+        }
+
         return $this->render('blog/show.html.twig',[
-            'article' => $article
+            'article' => $article, 
+            'commentForm' => $form->createView()
         ]);
     }
   
