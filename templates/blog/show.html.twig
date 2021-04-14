@@ -10,7 +10,7 @@
                 {{article.content | raw }}
         </div>
         <section class="commentaires">
-        <h3>{{article.comments | length }} Commentaires :</h3>
+        {# <h3>{{article.comments | length }} Commentaires :</h3>
         {% for comment in article.comments %}
             <div class="comment">
                 <div class="row">
@@ -22,7 +22,9 @@
                     </div>
                 </div>
             </div>
-            {% endfor %}
+            {% endfor %} #}
+
+            <post-comments data-post="{{ article.id }}" data-user="{{ app.user ? app.user.id : 0 }}"></post-comments>
 
             {% if app.user %}
             {{form_start(commentForm)}}
