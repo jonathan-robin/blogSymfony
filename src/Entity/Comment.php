@@ -2,11 +2,27 @@
 
 namespace App\Entity;
 
+use App\Entity\User;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CommentRepository::class)
+ * @ApiResource(
+ * attributes={
+ *  "order"={"createdAt":"DESC"}, 
+ * },
+ *  paginationItemsPerPage=2,
+ *  normalizationContext={"groups":{"read:comment"}},
+ *  collectionOperations={"get"},
+ *  itemOperations={"get"}
+ * )
+ * @ApiFilter(SearchFilter::class, properties={"article": "exact"})
  */
 class Comment
 {
@@ -14,26 +30,30 @@ class Comment
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"read:comment"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read:comment"})
      */
     private $author;
 
     /**
      * @ORM\Column(type="text")
+     * @Groups({"read:comment"})
      */
     private $content;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"read:comment"})
      */
     private $createdAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=article::class, inversedBy="comments")
+     * @ORM\ManyToOne(targetEntity=Article::class, inversedBy="comments")
      */
     private $article;
 
@@ -41,10 +61,23 @@ class Comment
     {
         return $this->id;
     }
-
-    public function getAuthor(): ?string
+    public function getAuthor():?user
     {
-        return $this->author;
+        $auth = new User($this->author);
+        // $info = new User($author);
+
+        // $infos->getId($author)
+        //         ->getUsername($author)
+        //         ->getEmail($author);
+        
+        //     $this->get
+        // )
+        // return $this->getId();
+                    // ->getUsername()
+                    // ->getEmail();
+        // $auth = new User($this->author);
+        // return $auth;
+        return $auth;
     }
 
     public function setAuthor(string $author): self

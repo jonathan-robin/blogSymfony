@@ -2,11 +2,15 @@
 
 namespace App\Entity;
 
+use App\Entity\Comment;
 use App\Repository\UserRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -16,7 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * )
  */
 class User implements UserInterface
-{
+    { 
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -25,6 +29,7 @@ class User implements UserInterface
     private $id;
 
     /**
+     * @Groups({"read:comment"})
      * @ORM\Column(type="string", length=255)
      * @Assert\Email()
      */
@@ -32,6 +37,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read:comment"})
      */
     private $username;
 
@@ -98,4 +104,5 @@ class User implements UserInterface
     public function getRoles(){
         return ['ROLE_USER'];
     }
+
 }
