@@ -14,8 +14,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 
 use App\Repository\ArticleRepository;
+use App\Repository\UserRepository;
 use App\Form\CommentType;
 use App\Entity\Article;
+use App\Entity\User;
 use App\Entity\Category;
 use App\Entity\Comment;
 
@@ -85,9 +87,9 @@ class BlogController extends AbstractController
      */
     public function show(Article $article, Request $request, EntityManagerInterface $manager) : Response
     {   
+
         $comment = new Comment();
         $form = $this->createForm(CommentType::class, $comment);
-
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
