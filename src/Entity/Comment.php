@@ -13,14 +13,30 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CommentRepository::class)
+ * 
  * @ApiResource(
- * attributes={
- *  "order"={"createdAt":"DESC"}, 
- * },
- *  paginationItemsPerPage=2,
- *  normalizationContext={"groups":{"read:comment"}},
- *  collectionOperations={"get"},
- *  itemOperations={"get"}
+ * 
+ *      attributes={
+ *      "order"={"createdAt":"DESC"}, 
+ *       },
+ * 
+ *       paginationItemsPerPage=2,
+ *  
+ *      normalizationContext={"groups":{"read:comment"}},
+ *      
+ *      collectionOperations={
+ *          "get",
+ *          "post" = {
+ *              "security"= "is_granted('IS_AUTHENTICATED_FULLY')",
+ *              "controller"= App\Controller\Api\CommentCreateController::class 
+ *          }
+ *      },
+ *  
+ *      itemOperations={
+ *          "get"={
+ *              "normalization_context"={"groups"={"read:comment", "read:full:comment"}}
+ *          }
+ *      }
  * )
  * @ApiFilter(SearchFilter::class, properties={"article": "exact"})
  */
@@ -36,6 +52,8 @@ class Comment
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotNull
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="username")
      * @Groups({"read:comment"})
      */
     private $author;
@@ -43,6 +61,8 @@ class Comment
     /**
      * @ORM\Column(type="text")
      * @Groups({"read:comment"})
+     * @Assert\NotNull
+     * @Assert\Length(min="8", minMessage="Votre message doit faire 8 caractères minimum.")
      */
     private $content;
 
@@ -54,6 +74,7 @@ class Comment
 
     /**
      * @ORM\ManyToOne(targetEntity=Article::class, inversedBy="comments")
+     * @Assert\NotNull
      */
     private $article;
 
@@ -61,29 +82,14 @@ class Comment
     {
         return $this->id;
     }
-    public function getAuthor():?user
+    public function getAuthor()
     {
-        $auth = new User($this->author);
-        // $info = new User($author);
-
-        // $infos->getId($author)
-        //         ->getUsername($author)
-        //         ->getEmail($author);
-        
-        //     $this->get
-        // )
-        // return $this->getId();
-                    // ->getUsername()
-                    // ->getEmail();
-        // $auth = new User($this->author);
-        // return $auth;
-        return $auth;
+        return $this->author;
     }
 
-    public function setAuthor(string $author): self
+    public function setAuthor(User $author): self
     {
-        $this->author = $author;
-
+        $this->author = $author->getUsername();  
         return $this;
     }
 

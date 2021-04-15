@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -36,15 +37,14 @@ class UserRepository extends ServiceEntityRepository
     }
     */
 
-    /*
-    public function findOneBySomeField($value): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
+    // public function findOneBySomeField($email): ?User
+    // {
+    //     return $this->createQueryBuilder('u')
+    //         ->andWhere('u.email = :email')
+    //         ->setParameter('email', $email)
+    //         // ->setParameter('username', $username)
+    //         ->getQuery()
+    //         ->getOneOrNullResult()
+    //     ;
+    // }
 }
