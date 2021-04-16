@@ -54,6 +54,7 @@ export function usePaginatedFetch(url){
         loading, 
         load,
         items,
+        setItems,
         count, 
         hasMore: next !== null
     }
@@ -66,17 +67,31 @@ export function useFetch(url, method = 'POST', callback = null){
     
     const load = useCallback(async(data = null) => {
         setLoading(true)
+        try{
             const response = await jsonLdFetch(url, method, data)
+            setLoading(false)
             if (callback){
                 callback(response)
             }
-
-        setLoading(false)
+        }
+    
+        catch(error){
+            if(error.violations){
+                setLoading(false)
+                setErrors(error.violations.reduce((acc, violation) => {
+                    acc[violation.propertyPath] = violation.message
+                    return acc;
+                },{}))
+            }
+           else{
+               throw error;
+        }
+    }
     },[url, method, callback])
 
     const clearError = useCallback((name)=> { 
         if (errors[name]){ 
-            setErrors(errors => ({...errors, [name] : null}))
+            setErrors(errors => ({...errors, [name]: null}))
         }
     },[errors])
 

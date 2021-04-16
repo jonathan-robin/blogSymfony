@@ -35,7 +35,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      itemOperations={
  *          "get"={
  *              "normalization_context"={"groups"={"read:comment", "read:full:comment"}}
- *          }
+ *          }, 
+ *          "put"={
+ *              "security"= "is_granted('EDIT_COMMENT', object)"
+ *          },
+ *          "delete"={
+ *              "security"= "is_granted('EDIT_COMMENT', object)"
+ *          },
  *      }
  * )
  * @ApiFilter(SearchFilter::class, properties={"article": "exact"})
@@ -57,6 +63,13 @@ class Comment
      * @Groups({"read:comment"})
      */
     private $author;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="id")
+     * @Groups({"read:comment"})
+     */
+    private $authorId;
 
     /**
      * @ORM\Column(type="text")
@@ -86,10 +99,19 @@ class Comment
     {
         return $this->author;
     }
+    public function getAuthorId(): ?int
+    {
+        return $this->authorId;
+    }
 
     public function setAuthor(User $author): self
     {
         $this->author = $author->getUsername();  
+        return $this;
+    }
+    public function setAuthorId(User $author): self
+    {
+        $this->authorId = $author->getId();  
         return $this;
     }
 

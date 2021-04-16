@@ -16,7 +16,8 @@ class CommentCreateController{
     }
 
     public function __invoke(Comment $data){
-        $data->setAuthor($this->security->getUser());
+        $data->setAuthor($this->security->getUser())
+             ->setAuthorId($this->security->getUser());
         return $data;
     }
 }
